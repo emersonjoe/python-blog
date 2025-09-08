@@ -5,8 +5,7 @@ WORKDIR /app
 # Instala ferramentas de compilação
 RUN apt-get update && apt-get install -y clang build-essential
 
-# Instala o PDM
-RUN pip install --no-cache-dir pdm
+
 
 # Copia todo o projeto antes de instalar dependências
 COPY . .
@@ -20,4 +19,4 @@ RUN apt-get purge -y clang build-essential && apt-get autoremove -y
 EXPOSE 8000
 
 # Usa o gunicorn da .venv
-CMD ["gunicorn", "app.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["/app/.venv/bin/gunicorn", "app.wsgi:application", "--bind", "0.0.0.0:8000"]
