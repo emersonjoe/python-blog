@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y clang build-essential
 # Copia todo o projeto antes de instalar dependências
 COPY . .
 
-# Instala dependências de produção com PDM
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Remove pacotes usados apenas para compilação
