@@ -19,4 +19,4 @@ RUN apt-get purge -y clang build-essential && apt-get autoremove -y
 EXPOSE 8000
 
 # Usa o gunicorn da .venv
-CMD ["/app/.venv/bin/gunicorn", "app.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "mysite.wsgi", "--bind", "0.0.0.0:8000", "--log-file", "-"]
