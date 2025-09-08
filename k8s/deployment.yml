@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-eos-blog-img
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-eos-blog-img
+  template:
+    metadata:
+      labels:
+        app: app-eos-blog-img
+    spec:
+      containers:
+        - name: app-eos-blog-img
+          image: faixapreta/app-eos-blog-img:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001

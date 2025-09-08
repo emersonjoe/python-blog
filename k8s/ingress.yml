@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-eos-blog-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: blog.eoslab.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-eos-blog-img
+                port:
+                  number: 3001
+  tls:
+  - hosts:
+    - blog.eoslab.com.br # Change by your domain
+    secretName: api-eos-blog-ingress-tls

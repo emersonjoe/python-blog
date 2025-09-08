@@ -1,0 +1,51 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [ main ]  # ou a branch de deploy desejada
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: faixapreta/app-eos-blog-img
+
+jobs:
+  build-deploy:
+    environment: vps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⚡ Checkout do código
+        uses: actions/checkout@v3
+
+      - name: 🐳 Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🏗️ Build da imagem Docker
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
+
+      - name: 📤 Push da imagem
+        run: |
+          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: ✏️ Substituir a imagem no deployment.yml
+        run: |
+          sed -i "s|image: .*$|image: $REGISTRY/$IMAGE_NAME:${{ github.sha }}|g" k8s/deployment.yml
+
+      - name: ⚙️ Configurar kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: 🔑 Gerar kubeconfig do cluster
+        run: |
+          echo "${{ secrets.KUBECONFIG_PROD }}" | base64 --decode > kubeconfig.yaml
+
+      - name: 🚀 Aplicar manifests no Kubernetes
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+        run: |
+          kubectl --kubeconfig "$KUBECONFIG" apply -f k8s/
